@@ -9,6 +9,7 @@
 #define LDR_PIN 34
 
 int LDRValue = 0;
+int k = 1;
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
@@ -126,19 +127,30 @@ void Task2code(void * pvParameters) {
   LDRValue = analogRead(LDR_PIN);
   String LDRValueString = String(LDRValue);
   int sensorValue = digitalRead(PIR_PIN);  // Read the PIR sensor value (HIGH or LOW)
+
+  if (k == 0 || LDRValue > 500) {
+    for (int i = 0; i < 10; i++){
+    digitalWrite(SpeakPin, HIGH);
+    delay(200);
+    digitalWrite(SpeakPin, LOW);
+    delay(200);
+    }
+    k = 1;
+  }
+  
+  
   
   if (sensorValue == HIGH) {
     Serial.println("Motion Detected! LDR Value: "+LDRValueString);
     sensorValueString = "Motion Detected... | LDR Value: "+LDRValueString+"\n";
-    digitalWrite(SpeakPin, HIGH);
-    delay(500);  // Wait for 2 seconds
-    digitalWrite(SpeakPin, LOW);
-    delay(2000);  // Wait for 2 seconds
+    k =0;
+    delay(100);  
   
   } 
   else if (sensorValue == LOW){
     Serial.println("No Motion !  LDR Value: "+LDRValueString);
     sensorValueString = "No Motion... | LDR Value: "+LDRValueString+"\n";
+    k =1;
   }
   
   else {
@@ -147,7 +159,7 @@ void Task2code(void * pvParameters) {
     
   }
   
-  delay(1000);  // Wait for 1 second before the next reading
+  delay(100);  // Wait for 1 second before the next reading
   }
 }
 
